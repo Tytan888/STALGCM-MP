@@ -1,13 +1,31 @@
-class Transition(from: String, read: String, pop: String, to: String, push: String) : Comparable<Transition> {
-    private val from: String = from
-    private val read: String = read
-    private val pop: String = pop
-    private val to: String = to
-    private val push: String = push
+class Transition(
+    private val from: String,
+    private val read: String,
+    private val pop: String,
+    private val to: String,
+    private val push: String
+) : Comparable<Transition> {
 
     fun getFrom(): String {
         return from
     }
+
+    fun getRead(): String {
+        return read
+    }
+
+    fun getPop(): String {
+        return pop
+    }
+
+    fun getTo(): String {
+        return to
+    }
+
+    fun getPush(): String {
+        return push
+    }
+
     fun formatInput(): String {
         return "($read, $pop)"
     }

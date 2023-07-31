@@ -13,7 +13,7 @@ class Controller {
 
         val carDelta = bufferedReader.readLine().toInt()
         val Delta = LinkedList<Transition>()
-        for (i in 0 until carDelta) {
+        for (i in 0..<carDelta) {
             val line = bufferedReader.readLine().split(" ")
             Delta.add(Transition(line[0], line[1], line[2], line[3], line[4]))
         }
@@ -22,7 +22,7 @@ class Controller {
         val qI = bufferedReader.readLine()
         val F = bufferedReader.readLine().split(" ")
 
-        var uniqueInputs = LinkedList<String>()
+        val uniqueInputs = LinkedList<String>()
         uniqueInputs.add("")
         for (transition in Delta) {
             if (transition.formatInput() != uniqueInputs.last()) {
@@ -39,12 +39,19 @@ class Controller {
         println("F: $F")
         println("Unique inputs: $uniqueInputs")
 
-        val view = View()
-        val model = Model()
+        val view = View(Q, Delta, qI, F, uniqueInputs)
+        val model = Model(Q, Sigma, Gamma, Delta, qI, F)
+
+        // TODO TEMP
+        view.turnInputFieldtoLabel()
+        view.highlightInputLabel(3)
+        view.setHighlightedTransition(2)
+        view.addStackItem("Z")
+        view.addStackItem("X")
     }
 
 }
 
-fun main(args: Array<String>) {
-    Controller();
+fun main() {
+    Controller()
 }

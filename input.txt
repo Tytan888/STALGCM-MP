@@ -1,11 +1,36 @@
-A B
-0 1
-X Y
-5
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AA
+0 1 2
+X Y Z D
+30
 A 0 λ A X
 A 1 X B λ
 B 0 X A Y
-A 0 X A Y
-B 1 Y B λ
+A 2 X A Y
+B 1 D B λ
+C 1 D B λ
+D 1 Y B λ
+E 1 Y Q λ
+F 1 Y B λ
+G 1 Y B λ
+H 1 Y X D
+I 1 Y B λ
+J 1 Y X D
+K 2 Y B λ
+L 0 Z B A
+M 2 Z B λ
+N 1 Y B λ
+O 1 Y B λ
+P 1 Y E λ
+Q 1 Y B λ
+R 1 Z B Q
+S 1 Y D λ
+T 2 D B λ
+U 1 Y B λ
+V 1 Y B λ
+W 1 Y B λ
+X 1 Y B λ
+Y 1 Y C λ
+Z 1 Y B λ
+AA 1 Y B λ
 A
 B
