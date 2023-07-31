@@ -1,0 +1,11 @@
+A B
+0 1
+X Y
+5
+A 0 λ A X
+A 1 X B λ
+B 0 X A Y
+A 0 X A Y
+B 1 Y B λ
+A
+B
