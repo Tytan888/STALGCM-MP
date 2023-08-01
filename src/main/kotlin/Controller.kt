@@ -63,7 +63,7 @@ class Controller {
             if(status==1){
                 i++
             }
-            if(model.getCurrentState()?.getIsFinal() ==true && model.getStack().empty()==true && i>=inputString.length){
+            if(model.getCurrentState()?.getIsFinal() ==true && i>=inputString.length){
                 valid=true
             }
         }while(status!=0)
