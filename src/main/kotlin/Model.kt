@@ -19,13 +19,14 @@ class Model(
     private val F: List<String> = F
     private var states = LinkedList<State>()
     private var stack = Stack<String>()
-
+    private var currentState:State=null!!;
     fun initializeMachine() {
 
         for (name in Q) {
             var stateTransitions = LinkedList<Transition>()
             var isStart: Boolean = false
             var isFinal: Boolean = false
+            stack.push("Z")
             if (name == qI) {
                 isStart = true
             }
@@ -41,6 +42,9 @@ class Model(
             }
 
             states.add(State(name, stateTransitions, isStart, isFinal))
+            if(isStart==true){
+                currentState=State(name, stateTransitions, isStart, isFinal)
+            }
 
         }
     }
@@ -49,17 +53,31 @@ class Model(
         var stateTransitions = currentState.getTransitions()
 
         for (transition in stateTransitions) {
-            if (transition.getRead() == readSymbol && transition.getPop() == stack.peek()) {
+            if (transition.getRead() == readSymbol && (transition.getPop() == stack.peek() || transition.getPop()=="λ")) {
                 if (transition.getPop() != "λ")
                     stack.pop()
                 if (transition.getPush() != "λ")
                     stack.push(transition.getPush())
-                return transition.getTo()
+                var destinationState = transition.getTo()
+                for(state in states) {
+                    if (state.getName() == transition.getTo()) {
+                        return state
+                    }
+                }
             }
         }
 
         return null!!
     }
 
+    fun getCurrentState():State{
+        return currentState
+    }
 
+    fun checkFinished(currentState: State):Boolean{
+        if(currentState.getIsFinal()==true && stack.empty()==true){
+            return true
+        }
+        return false
+    }
 }

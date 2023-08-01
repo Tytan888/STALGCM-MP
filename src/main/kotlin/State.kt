@@ -1,10 +1,16 @@
-class State (name:String, transitions: List<Transition>, isStart: Boolean, isFinal: Boolean){
+import java.util.LinkedList
+
+class State (name:String, transitions: LinkedList<Transition>, isStart: Boolean, isFinal: Boolean){
     private val name: String = name
-    private val transitions: Array<Transition> = transitions
+    private val transitions: LinkedList<Transition> = transitions
     private val isStart: Boolean = isStart
     private val isFinal: Boolean =  isFinal
 
-    fun getTransitions(): Array<Transition>{
+
+    fun getName(): String{
+        return name
+    }
+    fun getTransitions(): LinkedList<Transition>{
         return transitions
     }
 
