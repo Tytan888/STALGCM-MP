@@ -76,7 +76,6 @@ class Controller {
         // TODO TEMP
         view.turnInputFieldtoLabel()
         view.highlightInputLabel(3)
-        view.setHighlightedTransition(2)
         view.addStackItem("Z")
         view.addStackItem("X")
     }

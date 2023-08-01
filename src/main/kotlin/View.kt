@@ -81,6 +81,7 @@ class View(
         mainPanel.add(stackPanel, gbc)
     }
 
+    //TODO: Indicate that states are initial/final
     private fun renderStack() {
         val stackSize = stack.size
         if (stackSize <= Constants.STACK_DISPLAY) {
@@ -161,13 +162,14 @@ class View(
     fun getInputFieldText(): String {
         return inputField.text
     }
+
     fun turnInputFieldtoLabel() {
         inputField.isVisible = false
         inputLabelAfter.text = inputField.text
         inputLabelAfter.isVisible = true
     }
 
-    fun highlightInputLabel(index: Int){
+    fun highlightInputLabel(index: Int) {
         val before = inputLabelAfter.text.substring(0, index + 1)
         val after = inputLabelAfter.text.substring(index + 1)
         inputLabelAfter.text = "<html><font color = 'red'>$before</font>$after</html>"
@@ -183,20 +185,18 @@ class View(
         gbc.weighty = 1.0
         gbc.fill = GridBagConstraints.BOTH
         rightPanel.add(descPanel, gbc)
-
-        updateDesc(0)
     }
 
     fun resetDesc() {
         descLabel.text = "Machine is ready to run..."
     }
 
-    fun updateDesc(index: Int) {
-        val from = Delta[index].getFrom()
-        val read = Delta[index].getRead()
-        val pop = Delta[index].getPop()
-        val to = Delta[index].getTo()
-        val push = Delta[index].getPush()
+    fun updateDesc(transition: Transition) {
+        val from = transition.getFrom()
+        val read = transition.getRead()
+        val pop = transition.getPop()
+        val to = transition.getTo()
+        val push = transition.getPush()
 
         descLabel.text =
             "<html>Being in State <i>$from</i>, reading a <i>$read</i>, and popping a <i>$pop</i>,<br></br>the machine goes to State <i>$to</i> and pushes a <i>$push</i>.</html>"
@@ -266,43 +266,40 @@ class View(
         }
     }
 
-    fun setHighlightedTransition(index: Int) {
+    fun resetHighlightedTransition() {
         for (i in 0..uniqueInputs.size) {
             val tc = tableTable.getTableHeader().columnModel.getColumn(i)
             val renderer = HeaderRenderer(false)
             renderer.horizontalAlignment = SwingConstants.CENTER
             tc.setHeaderRenderer(renderer)
         }
-        if (index == -1) {
-            tableTable.highlightedRow = -1
-            tableTable.highlightedColumn = -1
-            return
-        } else {
-            println(Delta[index])
-            val from = Delta[index].getFrom()
-            val input = Delta[index].formatInput()
-            var row = -1
-            for (i in 0..Q.size) {
-                if (Q[i] == from) {
-                    row = i
-                    break
-                }
-            }
-            var col = -1
-            for (i in 0..uniqueInputs.size) {
-                if (uniqueInputs[i] == input) {
-                    col = i
-                    break
-                }
-            }
-            tableTable.highlightedRow = row
-            tableTable.highlightedColumn = col + 1
+    }
 
-            val tc = tableTable.getTableHeader().columnModel.getColumn(col + 1)
-            val renderer = HeaderRenderer(true)
-            renderer.horizontalAlignment = SwingConstants.CENTER
-            tc.setHeaderRenderer(renderer)
+    fun setHighlightedTransition(transition: Transition) {
+        resetHighlightedTransition()
+        val from = transition.getFrom()
+        val input = transition.formatInput()
+        var row = -1
+        for (i in 0..Q.size) {
+            if (Q[i] == from) {
+                row = i
+                break
+            }
         }
+        var col = -1
+        for (i in 0..uniqueInputs.size) {
+            if (uniqueInputs[i] == input) {
+                col = i
+                break
+            }
+        }
+        tableTable.highlightedRow = row
+        tableTable.highlightedColumn = col + 1
+
+        val tc = tableTable.getTableHeader().columnModel.getColumn(col + 1)
+        val renderer = HeaderRenderer(true)
+        renderer.horizontalAlignment = SwingConstants.CENTER
+        tc.setHeaderRenderer(renderer)
     }
 
     private fun initControlPanel() {
@@ -321,13 +318,8 @@ class View(
         rightPanel.add(controlPanel, gbc)
     }
 
-// TODO: Note: The plan is to make the left and right buttons be initially "Step Run" and "Timed Run" respectively.
+    // TODO: Note: The plan is to make the left and right buttons be initially "Step Run" and "Timed Run" respectively.
 // "Timed Run" will run the machine automatically, and "Step Run" will run the machine one step at a time.
-// When the machine is running on "Step Run", the buttons will change to "Step" and "Reset" respectively.
-// "Step" will run the machine one step at a time, and "Reset" will reset the machine to its initial state.
-// When the machine is running on "Timed Run", the buttons will be disabled until the machine finishes running.
-// When the machine finishes running, the left button will still be disabled while the right button will change to "Reset".
-// "Reset" will reset everything, including these buttons, to their initial states.
     fun setLeftButtonActionListener(listener: ActionListener) {
         controlLeftButton.addActionListener(listener)
     }
