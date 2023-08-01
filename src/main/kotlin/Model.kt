@@ -14,19 +14,20 @@ class Model(
     private val Q: List<String> = Q
     private val Sigma: List<String> = Sigma
     private val Gamma: List<String> = Gamma
-    private val Delta: LinkedList<Transition> = Delta;
-    private val qI: String = qI;
+    private val Delta: LinkedList<Transition> = Delta
+    private val qI: String = qI
     private val F: List<String> = F
     private var states = LinkedList<State>()
     private var stack = Stack<String>()
-    private var currentState:State=null!!;
+    private var currentState:State?=null
+    private var currentTransition:Transition?=null
     fun initializeMachine() {
-
+        stack.push("Z")
         for (name in Q) {
             var stateTransitions = LinkedList<Transition>()
             var isStart: Boolean = false
             var isFinal: Boolean = false
-            stack.push("Z")
+
             if (name == qI) {
                 isStart = true
             }
@@ -43,34 +44,67 @@ class Model(
 
             states.add(State(name, stateTransitions, isStart, isFinal))
             if(isStart==true){
-                currentState=State(name, stateTransitions, isStart, isFinal)
+                this.currentState=State(name, stateTransitions, isStart, isFinal)
             }
 
         }
     }
+    //return a 0 when nothing aka a transition to {} is used
+    // return a 1 if a non-lambda transition was used
+    //return 2 when a lambda transition is used
+    fun transitionState(readSymbol: String): Int {
+        var stateTransitions = currentState?.getTransitions()
+        var found=false
+        if (stateTransitions != null) {
+            for (transition in stateTransitions) {
 
-    fun transitionState(currentState: State, readSymbol: String): State {
-        var stateTransitions = currentState.getTransitions()
-
-        for (transition in stateTransitions) {
-            if (transition.getRead() == readSymbol && (transition.getPop() == stack.peek() || transition.getPop()=="λ")) {
-                if (transition.getPop() != "λ")
-                    stack.pop()
-                if (transition.getPush() != "λ")
-                    stack.push(transition.getPush())
-                var destinationState = transition.getTo()
-                for(state in states) {
-                    if (state.getName() == transition.getTo()) {
-                        return state
+                if (transition.getRead() == readSymbol && (transition.getPop() == stack.peek() || transition.getPop()=="λ")) {
+                    if (transition.getPop() != "λ")
+                        stack.pop()
+                    if (transition.getPush() != "λ")
+                        stack.push(transition.getPush())
+                    var destinationState = transition.getTo()
+                    for(state in states) {
+                        if (state.getName() == transition.getTo()) {
+                            this.currentState=state
+                            this.currentTransition=transition
+                            return 1
+                        }
+                    }
+                    found=true
+                }
+                if(!found){
+                    for(transition in stateTransitions){
+                        if(transition.getRead()=="λ" && (transition.getPop() == stack.peek() || transition.getPop()=="λ")){
+                            if (transition.getPop() != "λ")
+                                stack.pop()
+                            if (transition.getPush() != "λ")
+                                stack.push(transition.getPush())
+                            var destinationState = transition.getTo()
+                            for(state in states) {
+                                if (state.getName() == transition.getTo()) {
+                                    this.currentState=state
+                                    this.currentTransition=transition
+                                    return 2
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-
-        return null!!
+        this.currentState=null
+        this.currentTransition=null
+        return 0
     }
 
-    fun getCurrentState():State{
+    fun getCurrentTransition():Transition?{
+        return currentTransition
+    }
+    fun getStack():Stack<String>{
+        return stack
+    }
+    fun getCurrentState():State?{
         return currentState
     }
 
