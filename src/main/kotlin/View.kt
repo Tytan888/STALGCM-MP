@@ -113,6 +113,11 @@ class View(
         renderStack()
     }
 
+    fun replaceStack(newStack: LinkedList<String>) {
+        stack = newStack
+        renderStack()
+    }
+
     private fun initRightPanel() {
         rightPanel.preferredSize = Dimension(Constants.APP_WIDTH / 4, Constants.APP_HEIGHT)
         rightPanel.setLayout(GridBagLayout())
