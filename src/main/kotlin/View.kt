@@ -26,8 +26,9 @@ class View(
 
     private var inputPanel: JPanel = JPanel()
     private var inputLabel: JLabel = JLabel("Input String:")
-    private var inputField: JTextField = JTextField("ababa") //TODO: REMOVE THIS
+    private var inputField: JTextField = JTextField()
     private var inputLabelAfter: JLabel = JLabel()
+    private var inputFieldText: String = ""
 
     private var descPanel: JPanel = JPanel()
     private var descLabel: JLabel = JLabel("Machine is ready to run...")
@@ -81,9 +82,14 @@ class View(
         mainPanel.add(stackPanel, gbc)
     }
 
-    //TODO: Indicate that states are initial/final
     private fun renderStack() {
         val stackSize = stack.size
+        println(stack)
+        println(stackSize)
+        for(i in 0..<Constants.STACK_HEIGHT){
+            stackTable.model.setValueAt("", i, 0)
+            stackTable.model.setValueAt("", i, 1)
+        }
         if (stackSize <= Constants.STACK_DISPLAY) {
             stackTable.model.setValueAt("<html><b>Index</b></html>", 0, 0)
             stackTable.model.setValueAt("<html><b>Value</b></html>", 0, 1)
@@ -102,16 +108,6 @@ class View(
                 stackTable.model.setValueAt(stack[i + offset], Constants.STACK_HEIGHT - i - 1, 1)
             }
         }
-    }
-
-    fun addStackItem(item: String) {
-        stack.add(item)
-        renderStack()
-    }
-
-    fun removeStackItem() {
-        stack.removeLast()
-        renderStack()
     }
 
     fun replaceStack(newStack: LinkedList<String>) {
@@ -163,15 +159,19 @@ class View(
         return inputField.text
     }
 
-    fun turnInputFieldtoLabel() {
+    fun turnInputFieldToLabel() {
         inputField.isVisible = false
         inputLabelAfter.text = inputField.text
         inputLabelAfter.isVisible = true
+        inputFieldText = inputField.text
+        if(inputFieldText == ""){
+            inputFieldText = "λ"
+        }
     }
 
     fun highlightInputLabel(index: Int) {
-        val before = inputLabelAfter.text.substring(0, index + 1)
-        val after = inputLabelAfter.text.substring(index + 1)
+        val before = inputFieldText.substring(0, index + 1)
+        val after = inputFieldText.substring(index + 1)
         inputLabelAfter.text = "<html><font color = 'red'>$before</font>$after</html>"
     }
 
@@ -187,19 +187,63 @@ class View(
         rightPanel.add(descPanel, gbc)
     }
 
-    fun resetDesc() {
-        descLabel.text = "Machine is ready to run..."
+    fun updateDesc(transition: Transition?) {
+        if(transition != null){
+            val from = transition.getFrom()
+            val read = transition.getRead()
+            val pop = transition.getPop()
+            val to = transition.getTo()
+            val push = transition.getPush()
+
+            descLabel.text =
+                "<html>Being in State <i>$from</i>, reading a <i>$read</i>, and popping a <i>$pop</i>,<br></br>the machine goes to State <i>$to</i> and pushes a <i>$push</i>.</html>"
+        }
+        else{
+            descLabel.text = "Machine starts up with input string $inputFieldText..."
+        }
     }
 
-    fun updateDesc(transition: Transition) {
-        val from = transition.getFrom()
-        val read = transition.getRead()
-        val pop = transition.getPop()
-        val to = transition.getTo()
-        val push = transition.getPush()
+    fun finishedDesc(valid: Boolean, finalState: State?){
+        if(valid){
+            descLabel.text = "<html>Machine has finished with a valid string,<br></br>ending up on Final State ${finalState?.getName()}.</html>"
+        }
+        else{
+            descLabel.text = "Machine has finished with an invalid string."
+        }
+    }
 
-        descLabel.text =
-            "<html>Being in State <i>$from</i>, reading a <i>$read</i>, and popping a <i>$pop</i>,<br></br>the machine goes to State <i>$to</i> and pushes a <i>$push</i>.</html>"
+    fun finishTable(valid: Boolean){
+        if(valid){
+            tableTable.highlightedRow = -3
+            for(i in 0 until tableTable.columnCount){
+                val tc = tableTable.tableHeader.columnModel.getColumn(i)
+                val renderer = HeaderRenderer(2)
+                renderer.horizontalAlignment = SwingConstants.CENTER
+                tc.setHeaderRenderer(renderer)
+
+                tableTable.revalidate()
+                tableTable.repaint()
+
+                tableTable.tableHeader.revalidate()
+                tableTable.tableHeader.repaint()
+            }
+        }
+        else{
+            tableTable.highlightedRow = -2
+            for(i in 0 until tableTable.columnCount){
+                val tc = tableTable.tableHeader.columnModel.getColumn(i)
+                val renderer = HeaderRenderer(3)
+                renderer.horizontalAlignment = SwingConstants.CENTER
+                tc.setHeaderRenderer(renderer)
+
+                tableTable.revalidate()
+                tableTable.repaint()
+
+                tableTable.tableHeader.revalidate()
+                tableTable.tableHeader.repaint()
+            }
+        }
+
     }
 
     private fun initTablePanel() {
@@ -211,7 +255,7 @@ class View(
         val centerRenderer = DefaultTableCellRenderer()
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER)
 
-        tableTable.columnModel.getColumn(0).preferredWidth = 30
+        tableTable.columnModel.getColumn(0).preferredWidth = 40
         tableTable.columnModel.getColumn(0).headerValue = ""
         tableTable.columnModel.getColumn(0).setCellRenderer(centerRenderer)
 
@@ -241,7 +285,15 @@ class View(
         }
 
         for (i in 1..Q.size) {
-            tableTable.setValueAt(Q[i - 1], i - 1, 0)
+            var prefix = ""
+            var suffix = ""
+            if(qI == Q[i - 1]){
+                prefix += "→"
+            }
+            if (F.contains(Q[i - 1])) {
+                suffix += "*"
+            }
+            tableTable.setValueAt(prefix + Q[i - 1] + suffix, i - 1, 0)
         }
 
         Delta.forEach {
@@ -269,14 +321,17 @@ class View(
     fun resetHighlightedTransition() {
         for (i in 0..uniqueInputs.size) {
             val tc = tableTable.getTableHeader().columnModel.getColumn(i)
-            val renderer = HeaderRenderer(false)
+            val renderer = HeaderRenderer(0)
             renderer.horizontalAlignment = SwingConstants.CENTER
             tc.setHeaderRenderer(renderer)
         }
     }
 
-    fun setHighlightedTransition(transition: Transition) {
+    fun setHighlightedTransition(transition: Transition?) {
         resetHighlightedTransition()
+        if(transition == null){
+            return
+        }
         val from = transition.getFrom()
         val input = transition.formatInput()
         var row = -1
@@ -296,10 +351,16 @@ class View(
         tableTable.highlightedRow = row
         tableTable.highlightedColumn = col + 1
 
-        val tc = tableTable.getTableHeader().columnModel.getColumn(col + 1)
-        val renderer = HeaderRenderer(true)
+        val tc = tableTable.tableHeader.columnModel.getColumn(col + 1)
+        val renderer = HeaderRenderer(1)
         renderer.horizontalAlignment = SwingConstants.CENTER
         tc.setHeaderRenderer(renderer)
+
+        tableTable.revalidate()
+        tableTable.repaint()
+
+        tableTable.tableHeader.revalidate()
+        tableTable.tableHeader.repaint()
     }
 
     private fun initControlPanel() {
@@ -326,5 +387,13 @@ class View(
 
     fun setRightButtonActionListener(listener: ActionListener) {
         controlRightButton.addActionListener(listener)
+    }
+
+    fun disableLeftButton() {
+        controlLeftButton.isEnabled = false
+    }
+
+    fun disableRightButton() {
+        controlRightButton.isEnabled = false
     }
 }

@@ -37,6 +37,7 @@ class Transition(
     override fun compareTo(other: Transition): Int {
         return formatInput().compareTo(other.formatInput())
     }
+
     override fun toString(): String {
         return "δ($from, $read, $pop)" + " = " + formatOutput()
     }

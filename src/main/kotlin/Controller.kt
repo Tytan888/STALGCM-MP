@@ -1,12 +1,12 @@
 import java.io.BufferedReader
 import java.io.File
 import java.util.LinkedList
-import kotlin.reflect.typeOf
+import javax.swing.Timer
 
 class Controller {
 
     init {
-        val bufferedReader: BufferedReader = File("input1.txt").bufferedReader()
+        val bufferedReader: BufferedReader = File(Constants.FILE_NAME).bufferedReader()
 
         val Q = bufferedReader.readLine().split(" ")
         val Sigma = bufferedReader.readLine().split(" ")
@@ -32,52 +32,109 @@ class Controller {
         }
         uniqueInputs.removeAt(0)
 
-        println("Q: $Q "+ Q::class.simpleName)
-        println("Sigma: $Sigma "+Sigma::class.simpleName)
-        println("Gamma: $Gamma "+Gamma::class.simpleName)
-        println("Delta: $Delta "+Delta::class.simpleName)
-        println("qI: $qI "+qI::class.simpleName)
-        println("F: $F "+F::class.simpleName)
-        println("Unique inputs: $uniqueInputs")
-
         val view = View(Q, Delta, qI, F, uniqueInputs)
         val model = Model(Q, Sigma, Gamma, Delta, qI, F)
-        println("i got here")
+
         model.initializeMachine()
-        var inputString="0011"
-        var i=0
-        var status=0
-        var valid=false
 
-        do{
-            if(i<inputString.length){
-                status=model.transitionState(inputString[i].toString())
-            }else{
-                status=model.transitionState("")
+        var inputString = "temp"
+        var i = 0
+        var started = false
+        var status = -1
+        var valid = false
+        var finalState: State? = null
+
+        view.setLeftButtonActionListener {
+            if (!started) {
+                inputString = view.getInputFieldText()
+                view.turnInputFieldToLabel()
+                view.disableRightButton()
+                started = true
+            } else {
+
+                if (model.getCurrentState()?.getIsFinal() == true && i >= inputString.length && i == 0) {
+                    finalState = model.getCurrentState()
+                    valid = true
+                }
+
+                status = if (i < inputString.length) {
+                    model.transitionState(inputString[i].toString())
+                } else {
+                    model.transitionState("")
+                }
+
+                if (status == 1) {
+                    i++
+                }
+
+                if (model.getCurrentState()?.getIsFinal() == true && i >= inputString.length) {
+                    finalState = model.getCurrentState()
+                    valid = true
+                }
+
+                if (status == 0) {
+                    view.disableLeftButton()
+                }
             }
-            println(model.getCurrentState()?.getName())
-            println(model.getStack())
-            if(model.getCurrentState()==null){
-                println("no more transitions")
+            if (status != 0) {
+                view.updateDesc(model.getCurrentTransition())
+                view.highlightInputLabel(i - 1)
+                view.replaceStack(model.getStack())
+                view.setHighlightedTransition(model.getCurrentTransition())
+            } else {
+                println(finalState)
+                view.finishedDesc(valid, finalState)
+                view.finishTable(valid)
             }
-            if(status==1){
-                i++
-            }
-            if(model.getCurrentState()?.getIsFinal() ==true && i>=inputString.length){
-                valid=true
-            }
-        }while(status!=0)
-        if(valid==true){
-            println("accepted")
-        }else{
-            println("rejected")
         }
+        var timer: Timer? = null
+        view.setRightButtonActionListener {
+            timer = Timer(Constants.TIMER_DELAY) {
+                if (!started) {
+                    inputString = view.getInputFieldText()
+                    view.turnInputFieldToLabel()
+                    view.disableLeftButton()
+                    view.disableRightButton()
+                    started = true
+                } else {
 
-        // TODO TEMP
-        view.turnInputFieldtoLabel()
-        view.highlightInputLabel(3)
-        view.addStackItem("Z")
-        view.addStackItem("X")
+                    if (model.getCurrentState()?.getIsFinal() == true && i >= inputString.length && i == 0) {
+                        finalState = model.getCurrentState()
+                        valid = true
+                    }
+
+                    status = if (i < inputString.length) {
+                        model.transitionState(inputString[i].toString())
+                    } else {
+                        model.transitionState("")
+                    }
+                    println(model.getCurrentState()?.getName())
+                    println(model.getStack())
+                    if (status == 1) {
+                        i++
+                    }
+                    if (model.getCurrentState()?.getIsFinal() == true && i >= inputString.length) {
+                        finalState = model.getCurrentState()
+                        valid = true
+                    }
+
+                    if (status == 0) {
+                        timer?.stop()
+                    }
+                }
+                if (status != 0) {
+                    view.updateDesc(model.getCurrentTransition())
+                    view.highlightInputLabel(i - 1)
+                    view.replaceStack(model.getStack())
+                    view.setHighlightedTransition(model.getCurrentTransition())
+                } else {
+                    println(finalState)
+                    view.finishedDesc(valid, finalState)
+                    view.finishTable(valid)
+                }
+            }
+            timer?.start()
+        }
     }
 
 }

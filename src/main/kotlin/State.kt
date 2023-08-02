@@ -1,23 +1,16 @@
 import java.util.LinkedList
 
-class State (name:String, transitions: LinkedList<Transition>, isStart: Boolean, isFinal: Boolean){
-    private val name: String = name
-    private val transitions: LinkedList<Transition> = transitions
-    private val isStart: Boolean = isStart
-    private val isFinal: Boolean =  isFinal
+class State(private val name: String, private val transitions: LinkedList<Transition>, private val isStart: Boolean, private val isFinal: Boolean) {
 
-
-    fun getName(): String{
+    fun getName(): String {
         return name
     }
-    fun getTransitions(): LinkedList<Transition>{
+
+    fun getTransitions(): LinkedList<Transition> {
         return transitions
     }
 
-    fun getIsStart(): Boolean{
-        return isStart
-    }
-    fun getIsFinal(): Boolean{
+    fun getIsFinal(): Boolean {
         return isFinal
     }
 
