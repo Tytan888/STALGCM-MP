@@ -5,5 +5,5 @@ object Constants {
     const val STACK_HEIGHT = 32
     const val STACK_DISPLAY = 20
     const val TIMER_DELAY = 1000
-    const val FILE_NAME = "input1.txt"
+    const val FILE_NAME = "input.txt"
 }
