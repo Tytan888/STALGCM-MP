@@ -3,7 +3,7 @@
 This program is a simulation of the deterministic pushdown automata (DPDA).
 
 
-# Guidelines for File input.
+## Guidelines for File input.
 To run the program, have your machine be a text file and named input.txt for the program 
 to read and accept your machine properly.
 **FORMAT of the text File**
