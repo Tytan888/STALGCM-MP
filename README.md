@@ -24,6 +24,8 @@ q2 /* List of final states. */
 The machine assumes that Z is the start stack symbol. As such, please
 design any machines to be inputed in this program accordingly.
 
+For input and stack symbols, please ensure that each symbol is only one character long each.
+
 Do note that a machine that creates an infinite loop through
 λ-transitions on an input string considers said string to be rejected.
 
