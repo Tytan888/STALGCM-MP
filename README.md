@@ -10,10 +10,10 @@ to read and accept your machine properly.
 **FORMAT of the text File**
 ```
 q0 q1 q2 /* List of states separated by spaces. */
-0 1 c /* List of inputs separated by spaces. */
+0 1 c /* List of input symbols separated by spaces. */
 X Z /* List of stack symbols separated by spaces. */
 4 /* Number of transitions. */
-q0 0 λ q0 X /* Transitions in the format q s pop q' push... */
+q0 0 λ q0 X /* Transitions in the format "q s pop q' push"... */
 q0 1 X q1 λ /* ...such that δ(q,s,pop) = (q',push). */
 q1 1 X q1 λ
 q1 λ Z q2 λ
