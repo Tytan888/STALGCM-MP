@@ -24,7 +24,4 @@ q2 /* List of final states. */
 Do note that a machine that creates an infinite loop through
 λ-transitions on an input string considers said string to be rejected.
 
-Developed by:
-Don Laude A. Aspecto
-Lanz Kendall Y. Lim
-Tyler Justin H. Tan
+Developed by: Don Laude A. Aspecto, Lanz Kendall Y. Lim, and Tyler Justin H. Tan
