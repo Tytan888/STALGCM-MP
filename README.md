@@ -27,4 +27,6 @@ design any machines to be inputed in this program accordingly.
 Do note that a machine that creates an infinite loop through
 λ-transitions on an input string considers said string to be rejected.
 
+To re-run the machine on another input string, kindly exit and re-execute the program.
+
 Developed by: Don Laude A. Aspecto, Lanz Kendall Y. Lim, and Tyler Justin H. Tan
